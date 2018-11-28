@@ -73,7 +73,7 @@ def doc_vec(word_weights, doc_words, wv_model):
     num_docs = len(doc_words)
     if num_docs == 1:
         w = np.array([w])
-    part1 = np.matmul(prunned_word_weights, w)
+    part1 = np.matmul(prunned_word_weights.astype(float), w.astype(float))
     part2 = np.sum(prunned_word_weights)
     part3 = part1 / part2
     return part3
