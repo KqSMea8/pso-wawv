@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sys
 import pickle
 import numpy as np
@@ -48,8 +51,7 @@ def main(argv = None):
     creator.create("Particle", list, fitness=creator.FitnessMax, speed=list, best=None)
     results = pickle.load(open(results_filename, 'rb'))
 
-    print "Generating doc vecs...",
-    sys.stdout.flush()
+    print("Generating doc vecs...", end=" ", flush=True)
     pso_wawv_dvs = None
     for ws in doc_words:
         if pso_wawv_dvs is None:
@@ -59,19 +61,17 @@ def main(argv = None):
     num_docs = len(doc_words)
     if num_docs == 1:
         w = np.array([pso_wawv_dvs])
-    print "OK!"
+    print("OK!")
 
     # Save doc vecs
-    print "Saving doc vecs...",
-    sys.stdout.flush()
+    print("Saving doc vecs...", end=" ", flush=True)
     np.savetxt(dvs_filename, pso_wawv_dvs, fmt='%1.4f', delimiter=' ')
-    print "OK!"
+    print("OK!")
 
     # Save weights
-    print "Saving vocab weights...",
-    sys.stdout.flush()
+    print("Saving vocab weights...", end=" ", flush=True)
     pd.DataFrame({'word' : pd.Categorical(wv_model.vocab.keys()), 'weight' : list(results['test_best_part'])}).to_csv(weights_filename)
-    print "OK!"
+    print("OK!")
         
 
 if __name__ == '__main__':
