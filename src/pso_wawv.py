@@ -73,7 +73,8 @@ def doc_vec(word_weights, doc_words, wv_model):
     num_docs = len(doc_words)
     if num_docs == 1:
         w = np.array([w])
-    return np.matmul(prunned_word_weights, w) / np.sum(prunned_word_weights)
+    return np.matmul(prunned_word_weights,
+                     w) / np.sum(prunned_word_weights)
 
 
 def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model):
