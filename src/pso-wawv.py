@@ -1,5 +1,5 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 
 import sys
 import argparse
@@ -154,18 +154,18 @@ def main(argv = None):
     args = parser.parse_args(argv[1:])
 
     # Loading datasets
-    print "Building train and test datasets...",
+    print("Building train and test datasets...", end=" ")
     train_doc_words, train_doc_classes = load_ds(args.train_filename)
     train_X, valid_X, train_y, valid_y = train_test_split(train_doc_words, train_doc_classes,
                                                           test_size = args.valid_fraction,
                                                           stratify = train_doc_classes)
     test_doc_words, test_doc_classes = load_ds(args.test_filename)
-    print "OK!"
+    print("OK!")
 
     # Loading word vectors
-    print "Loading word vectors...",
+    print("Loading word vectors...", end=" ")
     wv_model = KeyedVectors.load_word2vec_format(args.wv_filename, binary=False)
-    print "OK!"
+    print("OK!")
 
     # Fitness and particle functions
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
