@@ -38,7 +38,7 @@ do
     done
     test_fn=data/${ds}/${fold}
     wv_fn=word_vectors_by_dataset/${ds}/${wvmodel}/${vdim}/wv_${ds}_${wvmodel}-${vdim}_w2v-format.vec
-    out_fn=results/pso-wawv_${ds}_${wvmodel}-${vdim}_fold-${fold}.pkl
+    out_fn=results/pso_wawv_${ds}_${wvmodel}-${vdim}_fold-${fold}.pkl
 
     echo ""
     echo "======= EXECUCAO FOLD ${fold} ======="
