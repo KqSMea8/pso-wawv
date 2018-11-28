@@ -156,9 +156,11 @@ def main(argv = None):
     # Loading datasets
     print("Building train and test datasets...", end=" ")
     train_doc_words, train_doc_classes = load_ds(args.train_filename)
+#     train_X, valid_X, train_y, valid_y = train_test_split(train_doc_words, train_doc_classes,
+#                                                           test_size = args.valid_fraction,
+#                                                           stratify = train_doc_classes)
     train_X, valid_X, train_y, valid_y = train_test_split(train_doc_words, train_doc_classes,
-                                                          test_size = args.valid_fraction,
-                                                          stratify = train_doc_classes)
+                                                          test_size = args.valid_fraction)
     test_doc_words, test_doc_classes = load_ds(args.test_filename)
     print("OK!")
 
