@@ -37,14 +37,14 @@ do
 	cat data/${ds}/${i} >> $train_fn
     done
     test_fn=data/${ds}/${fold}
-    wv_fn=../../word_vectors_by_dataset/${ds}/${wvmodel}/${vdim}/wv_${ds}_${wvmodel}-${vdim}_w2v-format.vec
+    wv_fn=word_vectors_by_dataset/${ds}/${wvmodel}/${vdim}/wv_${ds}_${wvmodel}-${vdim}_w2v-format.vec
     out_fn=results/pso-wawv_${ds}_${wvmodel}-${vdim}_fold-${fold}.pkl
 
     echo ""
     echo "======= EXECUCAO FOLD ${fold} ======="
     echo ""
 
-    python pso-wawv_2018-03-14.py -tr ${train_fn} -te ${test_fn} -w ${wv_fn} -o ${out_fn} -ge ${ge} -vf ${vf}
+    python3 src/pso_wawv.py -tr ${train_fn} -te ${test_fn} -w ${wv_fn} -o ${out_fn} -ge ${ge} -vf ${vf}
 
     rm $train_fn
 done
