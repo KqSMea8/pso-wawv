@@ -29,11 +29,11 @@ def load_ds(ds_filename):
     ds_file = open(ds_filename, 'r')
     for d in ds_file:
         class_and_text = d.split(';')
-        words = set(class_and_text[1].split())
+        words = set(class_and_text[2].split())
         if len(words) == 0:
             continue
         doc_words.append(words)
-        doc_classes.append(class_and_text[0])
+        doc_classes.append(class_and_text[1])
     ds_file.close()
     return doc_words, doc_classes
 
@@ -73,13 +73,13 @@ def doc_vec(word_weights, doc_words, wv_model):
     num_docs = len(doc_words)
     if num_docs == 1:
         w = np.array([w])
-    part1 = np.matmul(prunned_word_weights.astype(float), w.astype(float))
+    part1 = np.matmul(prunned_word_weights, w)
     part2 = np.sum(prunned_word_weights)
     part3 = part1 / part2
     return part3
 
 
-def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model):
+def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model, multiclass):
     # Train document vectors
     train_dvs = []
     for x in train_X:
@@ -89,8 +89,13 @@ def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model):
     for x in valid_X:
         valid_dvs.append(doc_vec(particle, x, wv_model))
 
-    # Classifier training and validation                                                                             
-    classif = LogisticRegression(max_iter=1000000)
+    # Classifier training and validation
+    selected_solver = 'liblinear'
+    selected_mc = 'ovr'
+    if multiclass:
+        selected_solver = 'lbfgs'                                                                             
+        selected_mc = 'multinomial'
+    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc)
     classif.fit(train_dvs, train_y)
 
     valid_pred_y = classif.predict(valid_dvs)
@@ -99,7 +104,7 @@ def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model):
     return fitness,
 
 
-def test_classif(particle, train_doc_words, train_doc_classes, test_doc_words, test_doc_classes, wv_model):
+def test_classif(particle, train_doc_words, train_doc_classes, test_doc_words, test_doc_classes, wv_model, multiclass):
     # Train document vectors
     train_dvs = []
     for x in train_doc_words:
@@ -109,7 +114,12 @@ def test_classif(particle, train_doc_words, train_doc_classes, test_doc_words, t
     for x in test_doc_words:
         test_dvs.append(doc_vec(particle, x, wv_model))
     # Classifier
-    classif = LogisticRegression(max_iter=1000000)
+    selected_solver = 'liblinear'
+    selected_mc = 'ovr'
+    if multiclass:
+        selected_solver = 'lbfgs'                                                                             
+        selected_mc = 'multinomial'
+    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc)
     classif.fit(train_dvs, train_doc_classes)
     # Test predictions
     test_pred = classif.predict(test_dvs)
@@ -165,6 +175,7 @@ def main(argv = None):
     train_X, valid_X, train_y, valid_y = train_test_split(train_doc_words, train_doc_classes,
                                                           test_size = args.valid_fraction)
     test_doc_words, test_doc_classes = load_ds(args.test_filename)
+    mc = (len(set(train_y)) > 2) or (len(set(valid_y)) > 2)
     print("OK!")
 
     # Loading word vectors
@@ -186,7 +197,7 @@ def main(argv = None):
     toolbox.register("population", tools.initRepeat, list, toolbox.particle)
     toolbox.register("update", updateParticle, constriction_factor = chi, c1 = args.c1, c2 = args.c2)
     toolbox.register("evaluate", evalClassif, train_X = train_X, train_y = train_y,
-                     valid_X = valid_X, valid_y = valid_y, wv_model = wv_model)
+                     valid_X = valid_X, valid_y = valid_y, wv_model = wv_model, multiclass=mc)
 
     # Initial population
     pop = toolbox.population(n = args.pop_size)
@@ -233,7 +244,7 @@ def main(argv = None):
         if has_best:
             num_gen_no_progress = 0
             current_test_best = test_classif(best, train_doc_words, train_doc_classes,
-                                             test_doc_words, test_doc_classes, wv_model)
+                                             test_doc_words, test_doc_classes, wv_model, mc)
             if not test_best_particle or test_best < current_test_best:
                 test_best_particle = creator.Particle(best)
                 test_best_particle.fitness.values = best.fitness.values
