@@ -250,7 +250,7 @@ def main(argv = None):
 
     # Toolbox
     toolbox = base.Toolbox()
-    toolbox.register("particle", generate, size=(len(wv_model.wv.vocab) + wv_model.vector_size), pmin=args.pmin)
+    toolbox.register("particle", generate, size=(len(wv_model.wv.vocab) + wv_model.vector_size), pmin=args.pmin, pmax=args.pmax)
     toolbox.register("population", tools.initRepeat, list, toolbox.particle)
     toolbox.register("update", updateParticle, constriction_factor = chi, c1 = args.c1, c2 = args.c2)
     toolbox.register("evaluate", evalClassif, train_X = train_X, train_y = train_y,
