@@ -23,6 +23,9 @@ final_iter=$6
 # Validation fraction
 vf=$7
 
+# Number of threads
+nt=$8
+
 
 for ((fold=init_iter; fold<=final_iter; fold++))
 do
@@ -44,7 +47,7 @@ do
     echo "======= EXECUCAO FOLD ${fold} ======="
     echo ""
 
-    python3 src/pso_wawv_dims.py -tr ${train_fn} -te ${test_fn} -w ${wv_fn} -o ${out_fn} -ge ${ge} -vf ${vf}
+    python3 src/pso_wawv_dims.py -tr ${train_fn} -te ${test_fn} -w ${wv_fn} -o ${out_fn} -ge ${ge} -vf ${vf} -t ${nt}
 
     rm $train_fn
 done
