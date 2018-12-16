@@ -117,9 +117,10 @@ def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model, multicla
     selected_solver = 'liblinear'
     selected_mc = 'ovr'
     if multiclass:
-        selected_solver = 'lbfgs'                                                                             
+        #selected_solver = 'lbfgs'
+        selected_solver = 'newton-cg'
         selected_mc = 'multinomial'
-    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc)
+    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc, n_jobs=-1)
     classif.fit(train_dvs, train_y)
 
     valid_pred_y = classif.predict(valid_dvs)
@@ -166,9 +167,10 @@ def test_classif(particle, train_doc_words, train_doc_classes, test_doc_words, t
     selected_solver = 'liblinear'
     selected_mc = 'ovr'
     if multiclass:
-        selected_solver = 'lbfgs'                                                                             
+        #selected_solver = 'lbfgs'                                                                             
+        selected_solver = 'newton-cg'
         selected_mc = 'multinomial'
-    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc)
+    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc, n_jobs=-1)
     classif.fit(train_dvs, train_doc_classes)
     # Test predictions
     test_pred = classif.predict(test_dvs)
