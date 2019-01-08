@@ -47,7 +47,7 @@ do
     echo "======= EXECUCAO FOLD ${fold} ======="
     echo ""
 
-    python3 src/pso_wawv_dims.py -tr ${train_fn} -te ${test_fn} -w ${wv_fn} -o ${out_fn} -ge ${ge} -vf ${vf} -t ${nt}
+    python3 src/pso_wawv_dims.py -tr ${train_fn} -te ${test_fn} -w ${wv_fn} -o ${out_fn} -ge ${ge} -vf ${vf} -t ${nt} -ac 1
 
     rm $train_fn
 done

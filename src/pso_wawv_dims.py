@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import warnings
+from tensorflow.python.feature_column.feature_column import linear_model
+warnings.simplefilter("ignore")
+
 import sys
 import argparse
 import operator
@@ -18,9 +22,11 @@ from deap import tools
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score
+from sklearn import neighbors
+from sklearn import linear_model
+from sklearn.naive_bayes import GaussianNB
 
 from gensim.models import KeyedVectors
-
 
 def load_ds(ds_filename):
     doc_words = []
@@ -102,7 +108,7 @@ def doc_vec(word_weights, dim_weights, doc_words, wv_model):
 #     return dv
 
 
-def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model, multiclass):
+def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model, multiclass, alt_classif):
     # Train document vectors
     vocab_size = len(wv_model.wv.vocab)
     train_dvs = []
@@ -113,19 +119,26 @@ def evalClassif(particle, train_X, train_y, valid_X, valid_y, wv_model, multicla
     for x in valid_X:
         valid_dvs.append(doc_vec(particle[:vocab_size], particle[vocab_size:], x, wv_model))
 
-    # Classifier training and validation
-    selected_solver = 'liblinear'
-    selected_mc = 'ovr'
-    if multiclass:
-        #selected_solver = 'lbfgs'
-        selected_solver = 'newton-cg'
-        selected_mc = 'multinomial'
-    classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc, n_jobs=-1)
+    classif = None
+    if alt_classif == 1:
+#         classif = neighbors.KNeighborsClassifier(k, weights='uniform')
+#         classif = linear_model.SGDClassifier(max_iter=1000, tol=1e-3)
+        classif = GaussianNB()
+    else:
+        # Classifier training and validation
+        selected_solver = 'liblinear'
+        selected_mc = 'ovr'
+        if multiclass:
+            #selected_solver = 'lbfgs'
+            selected_solver = 'newton-cg'
+            selected_mc = 'multinomial'
+        classif = LogisticRegression(max_iter=1000000, solver=selected_solver, multi_class=selected_mc, n_jobs=-1)
+   
     classif.fit(train_dvs, train_y)
 
     valid_pred_y = classif.predict(valid_dvs)
     fitness = f1_score(valid_y, valid_pred_y, average = "macro")
-
+    
     return fitness,
 
 
@@ -226,6 +239,8 @@ def main(argv = None):
     parser.add_argument("-c2", "--c2", help = "C2", type = float, default = 2.0)
     parser.add_argument("-ge", "--greater_equal", help = "Consider greater or equal values as progress",
                         type = int, default = 0)
+    parser.add_argument("-ac", "--alternative_classifier", help = "Use alternative classifier",
+                        type = int, default = 0)
     args = parser.parse_args(argv[1:])
 
     # Loading datasets
@@ -256,7 +271,8 @@ def main(argv = None):
     toolbox.register("population", tools.initRepeat, list, toolbox.particle)
     toolbox.register("update", updateParticle, constriction_factor = chi, c1 = args.c1, c2 = args.c2)
     toolbox.register("evaluate", evalClassif, train_X = train_X, train_y = train_y,
-                     valid_X = valid_X, valid_y = valid_y, wv_model = wv_model, multiclass=mc)
+                     valid_X = valid_X, valid_y = valid_y, wv_model = wv_model, multiclass=mc,
+                     alt_classif=args.alternative_classifier)
 
     # Initial population
     pop = toolbox.population(n = args.pop_size)
