@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import warnings
-from tensorflow.python.feature_column.feature_column import linear_model
 warnings.simplefilter("ignore")
 
 import sys
