@@ -22,8 +22,6 @@ from deap import tools
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score
-from sklearn import neighbors
-from sklearn import linear_model
 from sklearn.naive_bayes import GaussianNB
 
 from gensim.models import KeyedVectors
